@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/index.js"></script>
+    <title>Ecommerce Chat</title>
+</head>
+
+<body>
+    <h1 class="text-center mb-5">Chat de ayuda Ecommerce</h1>
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div id="card" class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Chat</h5>
+                        <!-- Caja de visualización de mensajes -->
+                        <div id="chatBox" class="chat-box mb-3">
+                            <div class="message">
+                                <span class="message-author"></span>
+                                <span class="message-content"></span>
+                            </div>
+                            <div class="message">
+                                <span class="message-author"></span>
+                                <span class="message-content"></span>
+                            </div>
+                            <!-- Agrega más mensajes aquí -->
+                        </div>
+
+                        <!-- Formulario de chat -->
+                        <form onsubmit="return addMessage(event)">
+                            <!-- Input de nombre -->
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Nombre:</label>
+                                <input type="text" class="form-control" id="username" placeholder="Ingrese su nombre">
+                            </div>
+
+                            <!-- Textarea para el mensaje -->
+                            <div class="mb-3">
+                                <label for="text" class="form-label">Mensaje:</label>
+                                <textarea class="form-control" id="text" rows="3"
+                                    placeholder="Ingrese su mensaje"></textarea>
+                            </div>
+
+                            <!-- Botón de enviar -->
+                            <button type="submit" class="btn btn-primary">Enviar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

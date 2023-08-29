@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Perfil de Usuario GIT</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .profile-container {
+            max-width: 300px;
+        }
+
+        /* Estilos para centrar la tarjeta */
+        .centered-card {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5 centered-card">
+        <div class="profile-container">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Bienvenido GitHub USER, {{ username }}!</h4>
+                </div>
+                <div class="card-body">
+                    <p>Nombre de usuario: {{ username }}</p>
+                    <p>GitHub ID: {{ githubId }}</p>
+                    <a href="/logout" class="btn btn-danger btn-sm">Cerrar sesión</a>
+                </div>
+                <div class="container mt-3">
+                    <a href="/products" class="btn btn-primary">Continuar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

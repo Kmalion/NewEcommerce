@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Home</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    .product-card {
+      margin-bottom: 20px;
+    }
+
+    /* Estilos para la sección de perfil */
+    .profile-container {
+      top: 10px;
+      /* Distancia desde la parte superior */
+      right: 10px;
+      /* Distancia desde la parte derecha */
+      background-color: #f8f9fa;
+      padding: 10px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container mt-5 centered-card">
+    <div class="profile-container">
+      <h1>Ecommerce</h1> <!-- Título centrado -->
+      {{#if userLoggedIn}}
+      <p>Bienvenido, {{ userLoggedIn.first_name }}{{ userLoggedIn.username }}!</p>
+      <p>Rol: {{ userLoggedIn.role }}</p>
+      <p>Github ID: {{ userLoggedIn.githubId }}</p> <!-- Verifica que el nombre de la propiedad sea 'role' -->
+      <a href="/logout" class="btn btn-danger btn-sm">Cerrar sesión</a>
+      {{/if}}
+    </div>
+  </div>
+  <div class="container">
+    <h1>Productos</h1>
+    <h2>Lista de todos los productos</h2>
+    <div class="row">
+      {{#each products}}
+      <div class="col-md-4">
+        <div class="card product-card">
+          <div class="card-body">
+            <h5 class="card-title">Id: {{this._id}}</h5>
+            <p class="card-text">Titulo: {{this.title}}</p>
+            <p class="card-text">Descripción: {{this.description}}</p>
+            <p class="card-text">Categoria: {{this.category}}</p>
+            <p class="card-text">Precio: {{this.price}}</p>
+            <p class="card-text">Imagen: {{this.thumbnail}}</p>
+            <p class="card-text">Codigo: {{this.code}}</p>
+            <p class="card-text">Estado: {{this.status}}</p>
+            <p class="card-text">Stock: {{this.stock}}</p>
+            <a href="/cart/add/{{this._id}}" class="btn btn-primary">Agregar al carrito</a>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+
+    {{#if hasNextPage}}
+    <a href="/products?page={{nextPage}}&limit=10" class="btn btn-primary">Siguiente</a>
+    {{/if}}
+
+    {{#if hasPrevPage}}
+    <a href="/products?page={{prevPage}}&limit=10" class="btn btn-primary">Anterior</a>
+    {{/if}}
+
+  </div>
+</body>
+
+</html>
