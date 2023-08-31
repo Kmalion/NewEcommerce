@@ -1,23 +1,20 @@
-import dotenv from "dotenv"
 import express from "express"
 import flash from "connect-flash"
 import session from "express-session"
-import passport from "passport"
-import http from "http"
-import Database from "./db.js"
+import passport from "./src/config/passport/passport-config.js"
 import { fileURLToPath } from 'url'
 import path from 'path';
 import MongoStore from "connect-mongo"
 import handlebars from "express-handlebars"
-import { routerSession } from "./router/session.router.js"
+import CONFIG from './src/config/config.js'
+import appRouter from './src/router/app.router.js'
+import { Strategy as LocalStrategy } from 'passport-local'
 
+const { PORT } = CONFIG
 const app = express();
-const server = http.createServer(app);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-
-dotenv.config();
 
 //Middelware Sesiones
 app.use(
@@ -31,8 +28,11 @@ app.use(
     })
 );
 
+
+
 app.use(passport.initialize());
 app.use(passport.session());
+
 // Configurar connect-flash
 app.use(flash());
 
@@ -52,19 +52,15 @@ app.engine('handlebars', handlebars.engine());
 app.set('view engine', 'handlebars');
 app.set('views', __dirname + '/views');
 path.join(__dirname, 'views')
+
 //MiddleWares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-//app.use('/', routerHome);
-//app.use('/chat', chatRouter);
-//app.use('/products', productsRouter);
-app.use('/', routerSession);
-//app.use('/auth', routerSession)
+
+app.use('/', appRouter)
 
 
-
-server.listen(8080, () => {
-    console.log('Servidor en el puerto 8080 !!');
+app.listen(PORT, () => {
+    console.log('Server UP');
     //Ejecuto la base de datos
-    Database.connect();
 }); 
