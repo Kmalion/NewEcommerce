@@ -3,7 +3,7 @@ import { Strategy as LocalStrategy } from 'passport-local';
 import { UsersMongoDAO } from '../../models/daos/mongo/users.mongo.dao.js';
 import bcrypt from 'bcrypt'
 
-const usersDAO = new UsersMongoDAO(); // O UsersMemoryDAO si prefieres
+const usersDAO = new UsersMongoDAO();// O UsersMemoryDAO si prefieres
 
 passport.use('login', new LocalStrategy({
     passReqToCallback: true, // Pasar el objeto req a la función de verificación
@@ -35,6 +35,36 @@ passport.use('login', new LocalStrategy({
         return done(error);
     }
 }));
+
+//////////////////// REGISTRO //////////////////////
+
+passport.use('register', new LocalStrategy(
+    { passReqToCallback: true, usernameField: 'email' },
+    async (req, email, password, done) => {
+        try {
+            const existingUser = await usersDAO.findOne({ email });
+
+            if (existingUser) {
+                return done(null, false, { message: 'Este email ya fue registrado. Intente de nuevo.' });
+            }
+
+            const { first_name, last_name, age, role } = req.body;
+
+            const newUser = await usersDAO.create({
+                email,
+                password: await bcrypt.hash(password, 10),
+                first_name,
+                last_name,
+                age,
+                role
+            });
+            return done(null, newUser, { message: 'Registro exitoso. Ahora puedes iniciar sesión.' });
+        } catch (error) {
+            return done(error);
+        }
+    }
+));
+
 //////////////////// SERIALIZACION ///////////////
 
 passport.serializeUser((user, done) => {
@@ -44,8 +74,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
     try {
-        // Deserialize the user by fetching from the database using the ID
-        const user = await User.findById(id);
+        const user = await usersDAO.findById(id);
         done(null, user);
     } catch (error) {
         done(error);

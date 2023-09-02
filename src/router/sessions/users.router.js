@@ -12,5 +12,6 @@ router.get('/view/register', UsersController);
 router.get('/', loginController);
 
 router.post('/auth/login-auth', UsersController.authenticateUser)
+router.post('/auth/register-auth', UsersController.registerUser)
 
 export default router

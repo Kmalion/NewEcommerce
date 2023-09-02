@@ -30,6 +30,25 @@ export class UsersController {
             });
         })(req, res, next);
     }
+
+    static async registerUser(req, res, next) {
+        passport.authenticate('register', async (err, user, info) => {
+            if (err) {
+                return next(err);
+            }
+
+            if (!user) {
+                return res.status(400).json({ message: info.message });
+            }
+
+            req.logIn(user, async (loginErr) => {
+                if (loginErr) {
+                    return next(loginErr);
+                }
+                return res.status(201).json({ message: info.message, user: user }); // Cambia esto por la respuesta que necesites
+            });
+        })(req, res, next);
+    }
 }
 
 
