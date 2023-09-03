@@ -21,6 +21,7 @@
     "express-session": "^1.17.3",
     "hbs": "^4.2.0",
     "mongoose": "^7.4.5",
+    "mongoose-paginate-v2": "^1.7.31",
     "node": "^20.5.1",
     "nodemon": "^3.0.1",
     "passport": "^0.6.0",

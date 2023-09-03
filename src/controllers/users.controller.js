@@ -7,12 +7,6 @@ const usersDAO = new UsersMongoDAO()
 
 export class UsersController {
     static async authenticateUser(req, res, next) {
-        // passport.authenticate('login', {
-        //     successRedirect: '/view/profile', // Redirige al perfil del usuario después del inicio de sesión exitoso
-        //     failureRedirect: '/view/login', // Redirige a la página de inicio de sesión en caso de fallo de autenticación
-        //     failureFlash: true, // Habilita mensajes flash para el fallo
-        //     successFlash: 'Inicio de sesión exitoso.', // Mensaje flash para el éxito
-        // })
         passport.authenticate('login', (err, user, info) => {
             if (err) {
                 return next(err);
@@ -26,7 +20,7 @@ export class UsersController {
                 if (loginErr) {
                     return next(loginErr);
                 }
-                return res.json(user); // Cambia esto por la respuesta que necesites
+                res.redirect('/view/profile');
             });
         })(req, res, next);
     }
