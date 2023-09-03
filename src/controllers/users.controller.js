@@ -1,6 +1,7 @@
 import passport from 'passport';
 import { UsersMemoryDAO } from '../models/daos/memory/users.memory.dao.js'
 import { UsersMongoDAO } from '../models/daos/mongo/users.mongo.dao.js';
+import { setUserLoggedIn } from '../models/daos/mongo/auth.js';
 
 //const usersDAO = new UsersMemoryDAO()
 const usersDAO = new UsersMongoDAO()
@@ -20,6 +21,7 @@ export class UsersController {
                 if (loginErr) {
                     return next(loginErr);
                 }
+                setUserLoggedIn(user);
                 res.redirect('/view/profile');
             });
         })(req, res, next);

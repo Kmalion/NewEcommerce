@@ -1,10 +1,9 @@
-import mongoose from 'mongoose';
+import ProductSchema from '../../models/schema/products.schema.js';
 import mongoosePaginate from 'mongoose-paginate-v2';
-import ProductSchema from '../../models/schema/products.schema.js'; // Asegúrate de importar correctamente los modelos de productos
 
-const Product = ProductSchema
+const Product = ProductSchema;
 
-const productsPaginateService = async (req, res) => {
+const productsPaginateService = async (req) => {
   try {
     const category = req.query.category;
     const page = parseInt(req.query.page);
@@ -29,27 +28,33 @@ const productsPaginateService = async (req, res) => {
       }
     }
 
-    const result = await Product.paginate({}, options); // Utiliza Product.paginate en lugar de Products.paginate
+    const result = await Product.paginate({}, options);
 
     if (result.docs.length > 0) {
       const products = result.docs.map((doc) => doc.toObject({ virtuals: true }));
-
-      // Aquí pasas los datos del usuario en sesión a la vista (asegúrate de tener userLoggedIn definido)
-      res.render('home', {
+      return {
         products,
-        userLoggedIn, // Pasamos el objeto con los datos del usuario en sesión a la vista
         hasNextPage: result.hasNextPage,
         hasPrevPage: result.hasPrevPage,
         nextPage: result.nextPage,
         prevPage: result.prevPage,
-      });
+      };
     } else {
-      return res.status(204).send('No se encuentran productos');
+      // En caso de que no haya productos, puedes devolver un objeto con los datos vacíos
+      return {
+        products: [],
+        hasNextPage: false,
+        hasPrevPage: false,
+        nextPage: null,
+        prevPage: null,
+      };
     }
   } catch (error) {
     console.error('Error al obtener los productos:', error);
-    res.status(500).json({ error: 'Error al obtener los productos' });
+    // Puedes lanzar el error para que sea manejado por el controlador
+    throw error;
   }
 };
 
-export default productsPaginateService;
+
+export default productsPaginateService
