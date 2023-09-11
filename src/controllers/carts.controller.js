@@ -2,6 +2,7 @@ import CartsServiceManager from "../services/carts/carts.manager.service.js";
 import CartSchema from "../models/schema/carts.schema.js";
 import CartsMongoDAO from "../models/daos/mongo/carts.mongo.js"
 
+
 const cartsDAO = new CartsMongoDAO()
 
 export const cartsController = async (req, res) => {
@@ -16,24 +17,23 @@ export const cartsController = async (req, res) => {
     }
 };
 
-export const addProductToCart = async (req, res) => {
+
+
+export const addProductToCartController = async (req, res) => {
     try {
-        const productId = req.params.productId;
+        const cartId = req.params.cid; // Obtener el ID del carrito desde los parámetros de la URL
+        const productId = req.params.pid; 
+        console.log('ID producto',productId)
+        const Carts = new CartsServiceManager();
+        const carts = await Carts.addProductToCart(cartId, productId)
+        res.redirect('/api/carts')
 
-        // Resto del código para agregar el producto al carrito
-        console.log('Producto agregado:', productId); // Imprime el ID del producto agregado en la consola
-
-        // Agregar producto a carrito con populate
-        const cart1 = await CartSchema.findOne({ _id: '64b20b6f702122c5c747cd15' });
-        cart1.products.push({ product: productId });
-        await cart1.save();
-
-        res.redirect('/api/carts'); // Redirige al usuario al carrito después de agregar el producto
     } catch (error) {
         console.error('Error al agregar el producto al carrito:', error);
-        res.status(500).json({ error: 'Error al agregar el producto al carrito' });
+        throw error;
     }
 }
+
 
 export const createCart = async (req, res) => {
     try {
@@ -55,12 +55,14 @@ export const getProductsByCartId = async (req, res) => {
     }
 }
 
-export const deleteProductCart = async (req, res) => {
+export const deleteProductCartController = async (req, res) => {
     try {
         const cartId = req.params.cid; // Obtener el ID del carrito desde los parámetros de la URL
         const productId = req.params.pid; 
+        console.log('Id del carrito desde el controller ', cartId)
         const Carts = new CartsServiceManager();
         const carts = await Carts.deleteProductCart(cartId , productId)
+        res.redirect('/api/carts')
 
     } catch (error) {
         console.error('Error al obtener los productos por ID de carrito:', error);
@@ -74,6 +76,7 @@ export const updateCart = async (req, res) => {
             const quantity = req.body.quantity;
             const Carts = new CartsServiceManager();
             const carts = await Carts.updateCart(cartId , productId, quantity)
+            res.redirect('/api/carts')
         } catch (error) {
             console.error('Error al obtener los productos por ID de carrito:', error);
                 res.status(500).json({ error: 'Error al obtener los productos por ID de carrito' });

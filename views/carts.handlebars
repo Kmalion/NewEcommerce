@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Carritos</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -7,8 +8,16 @@
     .quantity-section {
       margin-top: auto;
     }
+
+    .thumbnail-image {
+      max-width: 100%;
+      height: auto;
+      max-height: 200px;
+      /* Esto limita la altura de la imagen si es muy alta */
+    }
   </style>
 </head>
+
 <body>
   <div class="container">
     <h1>Carritos</h1>
@@ -19,14 +28,14 @@
         <div class="card mb-3">
           <div class="card-body">
             <h5 class="card-title">ID del Carrito: {{_id}}</h5>
-            <p class="card-text">Fecha: {{date}}</p>
+            <p class="card-text">Fecha de creacion: {{date}}</p>
             <p class="card-text">Productos:</p>
             <ul class="list-group list-group-flush">
               {{#each products}}
               <li class="list-group-item">
                 <h6>ID del Producto: {{product._id}}</h6>
                 <p>Título: {{product.title}}</p>
-                <p>Imagen: {{product.thumbnail}}</p>
+                <p class="card-text"><img class="thumbnail-image" src="{{this.thumbnail}}" alt="Thumbnail"></p>
                 <p>Descripción: {{product.description}}</p>
                 <p>Categoría: {{product.category}}</p>
                 <p class="price">Precio: ${{product.price}}</p>
@@ -34,12 +43,13 @@
                 <div class="quantity-section d-flex align-items-center mt-3">
                   <div class="btn-group">
                     <span class="mr-2">Cantidad:</span>
-                    <button class="btn btn-sm btn-primary" onclick="decrementarCantidad('{{../_id}}', '{{product._id}}')">-</button>
-                    <span id="quantity-{{../_id}}-{{product._id}}" class="mx-2">{{quantity}}</span>
-                    <button class="btn btn-sm btn-primary" onclick="incrementarCantidad('{{../_id}}', '{{product._id}}')">+</button>
+                    <button class="btn btn-sm btn-primary"
+                      onclick="decrementarCantidad('{{../_id}}', '{{product._id}}')">-</button>
+                    <span id="quantity-{{../_id}}-{{product._id}}" class="mx-2" data-quantity="{{quantity}}">{{quantity}}</span>
+                    <button class="btn btn-sm btn-primary"
+                      onclick="incrementarCantidad('{{../_id}}', '{{product._id}}')">+</button>
+                      <div><a href="/api/carts/{{../_id}}/products/{{product._id}}" class="btn btn-danger btn-sm">Eliminar Producto</a></div>
                   </div>
-                  <button class="btn btn-sm btn-success ml-2" onclick="actualizarCantidad('{{../_id}}', '{{product._id}}')">Actualizar</button>
-                  <button class="btn btn-sm btn-danger ml-auto" onclick="eliminarProducto('{{../_id}}', '{{product._id}}')">Eliminar</button>
                 </div>
               </li>
               {{/each}}
@@ -48,38 +58,24 @@
         </div>
         {{/each}}
       </div>
+      {{#each carts}}
       <div class="col-md-6">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Total</h5>
-            <h6 class="card-subtitle mb-2 text-muted">Suma de precios</h6>
+            <h5 class="card-title">Su compra</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Compra total</h6>
             <p class="card-text" id="total-price"></p>
-            <h6 class="card-subtitle mb-2 text-muted">Cantidad total</h6>
+            <h6 class="card-subtitle mb-2 text-muted">Cantidad total de productos</h6>
             <p class="card-text" id="total-quantity"></p>
+            <a href="/api/{{_id}}/purchase/" class="btn btn-primary" >Proceder al pago de <span id="total-quantity-text"></span></a>
           </div>
         </div>
       </div>
+      {{/each}}
     </div>
   </div>
-
+  <script src="../src/services/carts/cartCalculationService.js" id="data" type="application/json"></script>
   <script>
-    function eliminarProducto(cartId, productId) {
-      const url = `/api/carts/${cartId}/products/${productId}`;
-
-      fetch(url, {
-        method: 'DELETE'
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log(data.message);
-        // Recargar la página para actualizar la lista de carritos
-        location.reload();
-      })
-      .catch(error => {
-        console.error('Error al eliminar el producto del carrito:', error);
-      });
-    }
-
     function incrementarCantidad(cartId, productId) {
       const quantityElement = document.getElementById(`quantity-${cartId}-${productId}`);
       const currentQuantity = parseInt(quantityElement.textContent);
@@ -88,7 +84,11 @@
       quantityElement.textContent = newQuantity;
 
       // Recalcular el total de la cantidad
+      actualizarCantidad(cartId, productId)
       calcularTotalCantidad();
+      calcularTotalPrecios()
+      
+      
     }
 
     function decrementarCantidad(cartId, productId) {
@@ -100,11 +100,14 @@
         quantityElement.textContent = newQuantity;
 
         // Recalcular el total de la cantidad
+        actualizarCantidad(cartId, productId)
         calcularTotalCantidad();
+        calcularTotalPrecios()
+        
       }
     }
 
-    function actualizarCantidad(cartId, productId) {
+ function actualizarCantidad(cartId, productId) {
       const quantityElement = document.getElementById(`quantity-${cartId}-${productId}`);
       const newQuantity = parseInt(quantityElement.textContent);
 
@@ -128,28 +131,51 @@
 
           // Recalcular el total de la cantidad
           calcularTotalCantidad();
+          
         })
         .catch(error => {
           console.error('Error al actualizar la cantidad del producto en el carrito:', error);
         });
     }
+function calcularTotalPrecios() {
+  const totalPriceElement = document.getElementById("total-price");
+  const productElements = document.querySelectorAll(".card-body > ul > li");
 
-    // Calcular el total de los precios de los productos
-    function calcularTotalPrecios() {
-      const totalPriceElement = document.getElementById("total-price");
-      const productPrices = Array.from(document.querySelectorAll(".card-body > ul > li > .price")).map(priceElement => parseFloat(priceElement.textContent.replace("Precio: $", "")));
-      const total = productPrices.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
-      totalPriceElement.textContent = `$${total.toFixed(2)}`;
-    }
+  let total = 0;
 
-// Calcular el total de la cantidad de productos
-function calcularTotalCantidad() {
-  const totalQuantityElement = document.getElementById("total-quantity");
-  const productQuantities = Array.from(document.querySelectorAll(".card-body > ul > li > .quantity-section > .btn-group > span[id^='quantity-']")).map(quantityElement => parseInt(quantityElement.textContent));
-  const total = productQuantities.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
-  totalQuantityElement.textContent = total.toString();
+  productElements.forEach(productElement => {
+    const priceElement = productElement.querySelector(".price");
+    const quantityElement = productElement.querySelector(".quantity-section > .btn-group > span[data-quantity]");
+
+    console.log("Precio Elemento:", priceElement);
+    console.log("Cantidad Elemento:", quantityElement);
+
+    const price = parseFloat(priceElement.textContent.replace("Precio: $", ""));
+    const quantity = parseInt(quantityElement.getAttribute("data-quantity"));
+
+    console.log("Precio:", price);
+    console.log("Cantidad:", quantity);
+
+    const productTotal = price * quantity;
+    total += productTotal;
+  });
+
+  console.log("Total:", total);
+
+  totalPriceElement.textContent = `$${total.toFixed(2)}`;
 }
 
+    // Calcular el total de la cantidad de productos
+    function calcularTotalCantidad() {
+      const totalQuantityElement = document.getElementById("total-quantity");
+      const productQuantities = Array.from(document.querySelectorAll(".card-body > ul > li > .quantity-section > .btn-group > span[id^='quantity-']")).map(quantityElement => parseInt(quantityElement.textContent));
+      const total = productQuantities.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+      totalQuantityElement.textContent = total.toString();
+
+      // Actualizar la cantidad en el botón de proceder al pago
+      const totalQuantityTextElement = document.getElementById("total-quantity-text");
+      totalQuantityTextElement.textContent = `${total} productos`;
+    }
 
     // Calcular el total inicial al cargar la página
     document.addEventListener("DOMContentLoaded", () => {
@@ -158,4 +184,5 @@ function calcularTotalCantidad() {
     });
   </script>
 </body>
+
 </html>

@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url'
 import path from 'path';
 import MongoStore from "connect-mongo"
 import handlebars from "express-handlebars"
+import { validateUserRole } from './src/services/policies/roleValidationService.js';
 import CONFIG from './src/config/config.js'
 import appRouter from './src/router/app.router.js'
 import { Strategy as LocalStrategy } from 'passport-local'
@@ -48,7 +49,12 @@ app.use(express.static(__dirname + '/public'));
 
 
 // Configuracion de HandleBars
-app.engine('handlebars', handlebars.engine());
+app.engine('handlebars', handlebars.engine({
+    extname: 'handlebars',
+    defaultLayout: 'main',
+    helpers: {
+        validateUserRole: validateUserRole,
+    }}));
 app.set('view engine', 'handlebars');
 app.set('views', __dirname + '/views');
 path.join(__dirname, 'views')

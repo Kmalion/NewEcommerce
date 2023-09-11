@@ -19,8 +19,6 @@ class ProductManagerService {
 
             const product = new Product(newProduct);
             await product.save();
-
-            console.table(product);
             console.log('Creación de producto satisfactoria!');
         } catch (error) {
             console.error('Error al agregar el producto:', error);
