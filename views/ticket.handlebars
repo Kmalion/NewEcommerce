@@ -3,28 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ticket de comnpra</title>
+    <title>Ticket de compra</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .card {
+            max-width: 600px;
+            width: 100%;
+        }
+        .card-body {
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
     <div class="card">
-  <div class="card-body">
-    <h5 class="card-title">Ticket de Compra</h5>
-    <p class="card-text">Cliente: {{customerName}} ({{customerEmail}})</p>
-    <p class="card-text">Total de Productos: {{totalQuantity}}</p>
-    <p class="card-text">Precio Total: ${{totalPrice}}</p>
-    <h6 class="card-subtitle mb-2 text-muted">Detalles de la Compra</h6>
-    <ul class="list-group">
-      {{#each products}}
-        <li class="list-group-item">
-          <p>Producto: {{this.productName}}</p>
-          <p>Precio: ${{this.price}}</p>
-          <p>Cantidad: {{this.quantity}}</p>
-        </li>
-      {{/each}}
-    </ul>
-  </div>
-</div>
-
+        <div class="card-body">
+            <h5 class="card-title">Ticket de Compra</h5>
+            <p class="card-text">Fecha de compra No. : {{this.purchase_datetime}}</p>
+            <p class="card-text">Factura No. : {{code}}</p>
+            <p class="card-text">Cliente: {{this.purchaser}}</p>
+            <p class="card-text">Compra total: ${{this.amount}}</p>
+            <h6 class="card-subtitle mb-2 text-muted">Detalles de la Compra</h6>
+            {{!-- <ul class="list-group">
+                {{#each products}}
+                    <li class="list-group-item">
+                        <p>Producto: {{this.productName}}</p>
+                        <p>Precio: ${{this.price}}</p>
+                        <p>Cantidad: {{this.quantity}}</p>
+                    </li>
+                {{/each}}
+            </ul> --}}
+            <a href="/" class="btn btn-primary mt-3">Regresar a la tienda</a>
+        </div>
+    </div>
 </body>
 </html>
+

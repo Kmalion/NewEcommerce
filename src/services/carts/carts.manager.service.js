@@ -1,6 +1,7 @@
 //Administrador de carrito ---- Crsitian Camilo Florez Prieto --- Practica inmtegradora M<ongo DB--- Backend
 import mongoose from 'mongoose'
-import CartSchema from '../../models/schema/carts.schema.js' // Importar el modelo de Cart
+import CartSchema from '../../models/schema/carts.schema.js' 
+import ProductSchema from '../../models/schema/products.schema.js';// Importar el modelo de Cart
 
 
 class CartsServiceManager {
@@ -58,13 +59,31 @@ class CartsServiceManager {
             // Obtener el carrito por ID
             const cart = await CartSchema.findById(cartId).populate('products.product');
             if (!cart) {
-                
+                return null; 
+                console.log("no se encuentra el carrito")// Si no se encuentra el carrito, puedes devolver null o un valor indicativo de que no se encontró.
             }
             // Obtener los productos del carrito
             const products = cart.products;
-            res.json(products);
+            console.log(products)
+            return products;
         } catch (error) {
             console.error('Error al obtener los productos por ID de carrito:', error);
+            throw error;
+        }
+    }
+    async getStockForProduct(productId) {
+        try {
+            // Suponiendo que tienes un modelo de productos llamado ProductSchema
+            const product = await ProductSchema.findById(productId);
+
+            if (product) {
+                return product.stock; // Devuelve la cantidad de stock del producto
+            } else {
+                return null; // Si el producto no se encuentra, puedes devolver null o un valor indicativo
+            }
+        } catch (error) {
+            console.error('Error al obtener el stock del producto:', error);
+            throw error;
         }
     }
 
