@@ -1,0 +1,65 @@
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Testing Productos MOCK</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        .product-card {
+            margin-bottom: 20px;
+        }
+
+        .profile-container {
+            top: 10px;
+            right: 10px;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .thumbnail-image {
+            max-width: 100%;
+            height: auto;
+            max-height: 200px;
+            /* Esto limita la altura de la imagen si es muy alta */
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Productos TESTING MOCK</h1>
+    <h2>Lista de todos los productos</h2>
+            <div class="mt-2"><a href="/products/create" class="btn btn-success btn-sm">Crear Producto</a></div>
+    <div class="row">
+        {{#each products}}
+        <div class="col-md-4">
+            <div class="card product-card">
+                <div class="card-body">
+                    <h5 class="card-title">Número de Producto: {{@index}}</h5> <!-- Aquí se incluye el número de producto -->
+                    <p class="card-text">Id: {{this._id}}</p>
+                    <p class="card-text">Titulo: {{this.title}}</p>
+                    <p class="card-text">Descripción: {{this.description}}</p>
+                    <p class="card-text">Categoria: {{this.category}}</p>
+                    <p class="card-text">Precio: $ {{this.price}}</p>
+                    <p class="card-text"><img class="thumbnail-image" src="{{this.thumbnail}}" alt="Thumbnail"></p>
+                    <p class="card-text">Codigo: {{this.code}}</p>
+                    <p class="card-text">Estado: {{this.status}}</p>
+                    <p class="card-text">Stock: {{this.stock}}</p>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+</div>
+
+
+    </div>
+    <script>
+        import '@fortawesome/fontawesome-free/css/all.css';
+    </script>
+</body>
+
+</html>

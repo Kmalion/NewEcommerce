@@ -54,12 +54,11 @@
                 <p class="card-text">Titulo: {{this.title}}</p>
                 <p class="card-text">Descripción: {{this.description}}</p>
                 <p class="card-text">Categoria: {{this.category}}</p>
-                <p class="card-text">Precio:  {{this.price}}</p>
+                <p class="card-text">Precio: $ {{this.price}}</p>
                 <p class="card-text"><img  class="thumbnail-image"src="{{this.thumbnail}}" alt="Thumbnail"></p>
                 <p class="card-text">Codigo: {{this.code}}</p>
                 <p class="card-text">Estado: {{this.status}}</p>
                 <p class="card-text">Stock: {{this.stock}}</p>
-                <p class="card-text">ROL: {{../userProfile.role}}</p>
                 
                 {{#if (validateUserRole ../this.userProfile "admin")}}
                   
