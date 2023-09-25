@@ -10,6 +10,7 @@ import { validateUserRole } from './src/services/policies/roleValidationService.
 import CONFIG from './src/config/config.js'
 import appRouter from './src/router/app.router.js'
 import { Strategy as LocalStrategy } from 'passport-local'
+import { addLogger } from "./src/utils/logger.js";
 
 const { PORT } = CONFIG
 const app = express();
@@ -47,7 +48,6 @@ app.use((req, res, next) => {
 
 app.use(express.static(__dirname + '/public'));
 
-
 // Configuracion de HandleBars
 app.engine('handlebars', handlebars.engine({
     extname: 'handlebars',
@@ -58,6 +58,13 @@ app.engine('handlebars', handlebars.engine({
 app.set('view engine', 'handlebars');
 app.set('views', __dirname + '/views');
 path.join(__dirname, 'views')
+
+app.use(addLogger)
+
+app.get('/loggerTest', (req,res)=>{
+    req.logger.info("Esto es un mensaje INFO")
+    res.send("Pruebas de logger en PRODCCION")
+})
 
 //MiddleWares
 app.use(express.json());

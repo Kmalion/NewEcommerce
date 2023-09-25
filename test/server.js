@@ -4,6 +4,7 @@ import handlebars from "express-handlebars"
 import { fileURLToPath } from 'url'
 import path from 'path';
 import errorMiddleware from "./middleware/indexControlError.js"
+import { addLogger } from "./src/utils/logger.js";
 
 const app = express()
 const __filename = fileURLToPath(import.meta.url);
@@ -13,8 +14,12 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 app.use('/', productRouter)
 app.use(errorMiddleware)
+app.use(addLogger)
 
-
+app.get('/loggerTest', (req,res)=>{
+    req.logger.debug("Esto es alerta debug")
+    res.send("Pruebas de logger EN DESARROLLO")
+})
 
 // Configuracion de HandleBars
 app.engine('handlebars', handlebars.engine({
