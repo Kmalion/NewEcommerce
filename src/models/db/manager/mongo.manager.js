@@ -6,7 +6,7 @@ export class MongoManager {
     static #instance;
 
     constructor() {
-        mongoose.connect(CONFIG.MONGO_URI)
+        mongoose.connect(CONFIG.mongo.MONGO_URI)
             .then(() => {
                 console.log("Connected to DB")
             })

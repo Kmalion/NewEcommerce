@@ -2,8 +2,12 @@ import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { UsersMongoDAO } from '../../models/daos/mongo/users.mongo.dao.js';
 import bcrypt from 'bcrypt'
+import jwt,{ExtractJwt} from 'passport-jwt'
+import config from '../config.js';
+
 
 const usersDAO = new UsersMongoDAO();// O UsersMemoryDAO si prefieres
+const JwtStrategy = jwt.Strategy
 
 passport.use('login', new LocalStrategy({
     passReqToCallback: true, // Pasar el objeto req a la función de verificación
@@ -64,6 +68,25 @@ passport.use('register', new LocalStrategy(
         }
     }
 ));
+
+const cookieExtractor=req=>{
+    let token = null
+    if(req && req.cookies){
+        token= req.cookies[config.jwt.COOKIE]}
+        return token
+}
+
+passport.use('current', new JwtStrategy({
+    jwtFromRequest:ExtractJwt.fromExtractors([cookieExtractor]),
+    secretOrKey: config.jwt.SECRET,
+
+}, async(jwt_payload, done)=>{
+    try{
+        return done(null, jwt_payload)
+    }catch(error){
+    return done(error)
+    }
+}))
 
 //////////////////// SERIALIZACION ///////////////
 

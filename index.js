@@ -11,8 +11,10 @@ import CONFIG from './src/config/config.js'
 import appRouter from './src/router/app.router.js'
 import { Strategy as LocalStrategy } from 'passport-local'
 import { addLogger } from "./src/utils/logger.js";
+import cookiePaser from 'cookie-parser'
 
-const { PORT } = CONFIG
+
+const  PORT  = CONFIG.mongo.PORT
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,6 +39,7 @@ app.use(passport.session());
 
 // Configurar connect-flash
 app.use(flash());
+app.use(cookiePaser())
 
 //Variables globales
 app.use((req, res, next) => {
@@ -65,6 +68,7 @@ app.get('/loggerTest', (req,res)=>{
     req.logger.info("Esto es un mensaje INFO")
     res.send("Pruebas de logger en PRODCCION")
 })
+
 
 //MiddleWares
 app.use(express.json());

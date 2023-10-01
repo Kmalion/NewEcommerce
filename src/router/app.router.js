@@ -4,8 +4,8 @@ import profileRouter from './profile/profile.router.js'
 import productsRouter from './products/products.router.js'
 import cartsRouter from './carts/carts.router.js'
 import purchaseRouter from './purchase/purchase.router.js'
-
-
+import applyPolicy from "../services/policies/auth.middleware.js";
+import mailRouter from '../router/mailing/mailing.router.js'
 
 const router = Router()
 
@@ -15,13 +15,14 @@ router.get('/', usersRouter);
 router.post('/auth/login-auth', usersRouter)
 router.post('/auth/register-auth', usersRouter)
 router.get('/view/profile', profileRouter);
+router.get('/current',applyPolicy(['ADMIN']),usersRouter)
 
 
 /// Productos ////
-router.get('/products',  productsRouter);
+router.get('/products', applyPolicy(['ADMIN','USER']), productsRouter);
 router.get('/products/create', productsRouter)
-router.post('/products/create', productsRouter)
-router.get('/product/delete/:pid', productsRouter)
+router.post('/products/create', applyPolicy(['ADMIN']), productsRouter)
+router.get('/product/delete/:pid',applyPolicy(['ADMIN']), productsRouter)
 
 /// Carts /// 
 
@@ -32,7 +33,12 @@ router.get('/api/carts/:id', cartsRouter)
 router.get('/api/carts/:cid/products/:pid', cartsRouter)
 router.put('/api/carts/:cid/products/:pid', cartsRouter)
 
+//MAILING///
 
+router.get('/mail', mailRouter)
+router.get('/mailrecovery', mailRouter)
+router.get('/reset-password',mailRouter)
+router.post('/mailrecovery', mailRouter)
 
 // PURCHASE ///
 router.get('/api/:cid/purchase', purchaseRouter);
