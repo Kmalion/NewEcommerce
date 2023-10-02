@@ -38,7 +38,10 @@ router.put('/api/carts/:cid/products/:pid', cartsRouter)
 router.get('/mail', mailRouter)
 router.get('/mailrecovery', mailRouter)
 router.get('/reset-password',mailRouter)
+router.post('/reset-password',mailRouter)
 router.post('/mailrecovery', mailRouter)
+router.get('/reset-password/:resetToken', mailRouter)
+router.post('/reset-password/:resetToken', mailRouter)
 
 // PURCHASE ///
 router.get('/api/:cid/purchase', purchaseRouter);

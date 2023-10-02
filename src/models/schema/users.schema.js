@@ -36,6 +36,12 @@ const userSchema = new mongoose.Schema({
 
     username: {
         type: String,
+    },
+    resetToken: {
+        type: String,
+    },
+    resetTokenExpires: {
+        type: Date,
     }
 });
 

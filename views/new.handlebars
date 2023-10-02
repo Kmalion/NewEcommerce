@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Restablecer Contraseña</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MFjF0csQgzIUhUVs6FfFYT6Oh3U3ErV73YEGFmILsU3BpkCUln1f5BcDY7HpM7IgH" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Restablecer Contraseña</h1>
+                {{#if errorMessage}}
+                    <div class="alert alert-danger" role="alert">
+                        {{errorMessage}}
+                    </div>
+                {{/if}}
+                {{#if successMessage}}
+                    <div class="alert alert-success" role="alert">
+                        {{successMessage}}
+                    </div>
+                {{/if}}
+                <form action="/reset-password/{{resetToken}}" method="post">
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">Nueva Contraseña</label>
+                        <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">Confirmar Contraseña</label>
+                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Restablecer Contraseña</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-qGiFz7uhkE5wE9IiSzPmLvCJQG0pBhOu4M2sZS+nc2IitGjvh5ZfRG5zNtBYYKoKS" crossorigin="anonymous"></script>
+</body>
+</html>
