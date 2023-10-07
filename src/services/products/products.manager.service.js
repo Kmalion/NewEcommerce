@@ -92,6 +92,21 @@ class ProductManagerService {
             throw error;
         }
     }
+    async getProductOwner(productId) {
+        console.log('Prodcuto ID en el servicio', productId)
+        try {
+            const product = await Product.findById(productId);
+            if (!product) {
+                throw new Error('Producto no encontrado');
+            }
+
+            const owner = product.owner; // Aquí asumo que la propiedad "owner" está almacenada en el modelo de producto
+
+            return owner;
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default ProductManagerService

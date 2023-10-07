@@ -1,12 +1,15 @@
 import  productsPaginateService  from '../services/products/products.paginator.service.js';
 import ProductManagerService from '../services/products/products.manager.service.js';
-import { validateUserRole } from '../services/policies/roleValidationService.js';
+import UserValidator from '../services/policies/roleValidationService.js'
 
 export const productsController = async (req, res, next) => {
   try {
     const Products = new ProductManagerService();
     const products = await Products.getProducts();
     const result = await productsPaginateService(req);
+    const productIds = products.map(product => product._id);
+    const owner = await Products.getProductOwner(productIds);
+    console.log('Onwner de cada producto',owner)
     const userProfile = {
       first_name: req.user.first_name,
       last_name: req.user.last_name,
@@ -14,6 +17,13 @@ export const productsController = async (req, res, next) => {
       age: req.user.age,
       role: req.user.role,
     };
+    const Validator = new UserValidator();
+    const isPremium = await Validator.validateUserRole(userProfile,"premium")
+    const isAdmin = await Validator.validateUserRole(userProfile, "admin");
+    console.log('Resultado desde controler es Admin? :', isAdmin)
+    console.log('Products owner controler: ', owner)
+    const isAdminOrOwner = await Validator.isUserAdminOrOwner(userProfile, owner);
+    console.log('Resultado desde controler verificacion OWNER? :', isAdminOrOwner)
     res.render('home', {
       products: result.products,
       userProfile,
@@ -21,6 +31,7 @@ export const productsController = async (req, res, next) => {
       hasPrevPage: result.hasPrevPage,
       nextPage: result.nextPage,
       prevPage: result.prevPage,
+      isAdmin, isAdminOrOwner,isPremium
     });
   } catch (error) {
     console.error('Error al obtener los productos:', error);
