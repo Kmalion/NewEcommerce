@@ -31,6 +31,10 @@ export const productsController = async (req, res, next) => {
 export const productsCreate = async (req, res, next) => {
   try {
     const Products = new ProductManagerService();
+    
+
+    const ownerId = req.user.email || 'admin'; 
+
     const newProduct = {
       title: req.body.title,
       category: req.body.category,
@@ -40,6 +44,7 @@ export const productsCreate = async (req, res, next) => {
       code: req.body.code,
       status: req.body.status,
       stock: req.body.stock,
+      owner: ownerId, // Asigna el ID del usuario en sesión como el propietario del producto
     };
 
     // Crea el nuevo producto en la base de datos
@@ -51,12 +56,13 @@ export const productsCreate = async (req, res, next) => {
     console.error('Error al crear el producto:', error);
     next(error); // Pasa el error al siguiente middleware de manejo de errores
   }
-}
+};
 
 export const productsCreateView = async (req, res, next) => {
   try {
-    res.render('createProduct')
-
+    const ownerId = req.user.email;
+    // Renderiza la plantilla y pasa el ID del usuario en sesión
+    res.render('createProduct', { ownerId });
   } catch (error) {
     console.error('Error al crear el producto:', error);
     next(error); // Pasa el error al siguiente middleware de manejo de errores

@@ -16,13 +16,14 @@ router.post('/auth/login-auth', usersRouter)
 router.post('/auth/register-auth', usersRouter)
 router.get('/view/profile', profileRouter);
 router.get('/current',applyPolicy(['ADMIN']),usersRouter)
+router.get('/api/users/changeRole/:userId', usersRouter)
 
 
 /// Productos ////
-router.get('/products', applyPolicy(['ADMIN','USER']), productsRouter);
-router.get('/products/create', productsRouter)
-router.post('/products/create', applyPolicy(['ADMIN']), productsRouter)
-router.get('/product/delete/:pid',applyPolicy(['ADMIN']), productsRouter)
+router.get('/products', productsRouter);
+router.get('/products/create', applyPolicy(['ADMIN','PREMIUM']),productsRouter)
+router.post('/products/create', applyPolicy(['ADMIN','PREMIUM']), productsRouter)
+router.get('/product/delete/:pid', productsRouter)
 
 /// Carts /// 
 

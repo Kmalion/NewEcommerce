@@ -4,6 +4,7 @@ import { UsersMemoryDAO } from '../models/daos/memory/users.memory.dao.js'
 import { UsersMongoDAO } from '../models/daos/mongo/users.mongo.dao.js';
 import { setUserLoggedIn } from '../models/daos/mongo/auth.js';
 import config from '../config/config.js';
+import User from '../models/schema/users.schema.js'
 
 
 const usersDAO = new UsersMongoDAO()
@@ -57,5 +58,25 @@ export class UsersController {
     }
     static async getCurrentUser(req,res,next){
         res.send(req.user)
+    }
+    static async changeUserRole(req, res, next) {
+        const userId = req.params.userId; // Suponiendo que el ID del usuario está en los parámetros de la solicitud
+    
+        try {
+            const user = await User.findByPk(userId); // Busca al usuario en la base de datos
+    
+            if (!user) {
+                return res.status(404).json({ message: 'Usuario no encontrado' });
+            }
+    
+            // Cambia el rol del usuario (cambia 'role' a lo que sea apropiado en tu modelo)
+            user.role = (user.role === 'user') ? 'premium' : 'user';
+    
+            await user.save(); // Guarda los cambios en la base de datos
+    
+            return res.status(200).json({ message: 'Rol de usuario actualizado exitosamente', user });
+        } catch (error) {
+            return res.status(500).json({ message: 'Error al actualizar el rol del usuario', error: error.message });
+        }
     }
 }
