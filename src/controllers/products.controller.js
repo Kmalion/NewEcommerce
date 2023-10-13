@@ -8,8 +8,7 @@ export const productsController = async (req, res, next) => {
     const products = await Products.getProducts();
     const result = await productsPaginateService(req);
     const productIds = products.map(product => product._id);
-    const owner = await Products.getProductOwner(productIds);
-    console.log('Onwner de cada producto',owner)
+    const owner = await products.map(product => product.owner);
     const userProfile = {
       first_name: req.user.first_name,
       last_name: req.user.last_name,
@@ -20,18 +19,21 @@ export const productsController = async (req, res, next) => {
     const Validator = new UserValidator();
     const isPremium = await Validator.validateUserRole(userProfile,"premium")
     const isAdmin = await Validator.validateUserRole(userProfile, "admin");
-    console.log('Resultado desde controler es Admin? :', isAdmin)
-    console.log('Products owner controler: ', owner)
     const isAdminOrOwner = await Validator.isUserAdminOrOwner(userProfile, owner);
-    console.log('Resultado desde controler verificacion OWNER? :', isAdminOrOwner)
+    const isOwner = await Validator.isOwner(userProfile, products);
+    const isOwnerResults = await Validator.isOwner(userProfile, products);
+    const productsWithOwnership = products.map((product, index) => ({
+      ...product,
+      isOwner: isOwnerResults[index]
+    }));
     res.render('home', {
       products: result.products,
-      userProfile,
+      userProfile, productsWithOwnership,
       hasNextPage: result.hasNextPage,
       hasPrevPage: result.hasPrevPage,
       nextPage: result.nextPage,
       prevPage: result.prevPage,
-      isAdmin, isAdminOrOwner,isPremium
+      isAdmin, isAdminOrOwner,isPremium,isOwner
     });
   } catch (error) {
     console.error('Error al obtener los productos:', error);
@@ -42,8 +44,6 @@ export const productsController = async (req, res, next) => {
 export const productsCreate = async (req, res, next) => {
   try {
     const Products = new ProductManagerService();
-    
-
     const ownerId = req.user.email || 'admin'; 
 
     const newProduct = {
