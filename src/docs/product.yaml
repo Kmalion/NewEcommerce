@@ -1,0 +1,25 @@
+paths:
+  /products/:
+    get:
+      summary: Obtiene la informacion de todos los productos
+      tags:
+        - Productos
+      responses:
+        "200":
+          description: Se obtinene los productos correctamente
+        "500":
+          description: No se puede entregar la informacion
+  /products/create/:
+    get:
+      summary: Obtiene la vista de formulario de creacion de productos
+      tags:
+        - Productos
+    post:
+      summary: Crea nuevo producto en la base de datos
+      tags:
+        - Productos
+  /products/delete/{pid}:
+    get:
+      summary: Borra producto por un ID especifico
+      tags:
+        - Productos

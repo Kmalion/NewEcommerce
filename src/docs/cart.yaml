@@ -1,0 +1,49 @@
+paths:
+  /api/carts/:
+    get:
+      summary: Obtiene la informacion del carrito
+      tags:
+        - Carrito
+      responses:
+        "200":
+          description: Se obtinene los productos correctamente
+        "500":
+          description: No se puede entregar la informacion
+    post:
+      summary: Crea el carrito en la base de datos
+      tags:
+        - Carrito
+      responses:
+        "200":
+          description: Se obtinene los productos correctamente
+        "500":
+          description: No se puede entregar la informacion
+  /api/carts/{id}/:
+    get:
+      summary: Obtiene productos por el ID del carrito
+      tags:
+        - Carrito
+      responses:
+        "200":
+          description: Se obtinene los productos correctamente
+        "500":
+          description: No se puede entregar la informacion
+  /api/carts/{cid}/products/{pid}:
+    get:
+      summary: Borra el producto por ID especifico de un Carrito con ID especifico
+      tags:
+        - Carrito
+      responses:
+        "200":
+          description: Se borra correctamente
+        "500":
+          description: No se puede entregar la informacion
+    put:
+      summary: Actualiza un producto de un ID especifico de un ID de un carrito especifico
+      tags:
+        - Carrito
+      responses:
+        "200":
+          description: Se actualiza correctamente
+        "500":
+          description: Error al actualizar

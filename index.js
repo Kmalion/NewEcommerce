@@ -11,6 +11,9 @@ import appRouter from './src/router/app.router.js'
 import { Strategy as LocalStrategy } from 'passport-local'
 import { addLogger } from "./src/utils/logger.js";
 import cookiePaser from 'cookie-parser'
+import swaggerJSDoc from "swagger-jsdoc"
+import swaggerUIExpress from 'swagger-ui-express'
+
 
 
 const  PORT  = CONFIG.mongo.PORT
@@ -18,6 +21,25 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const swaggerOptions={
+    definition:{
+        openapi:'3.0.1',
+        info:{
+            title: "Documentacion Ecommerce Dementho",
+            description: "API del Ecommerce",
+            contact:{
+                name: "Soporte de la API",
+                url:"wwww.dementho.com",
+                email: "dementhodesarrollo@gmail.com"
+            }
+        },
+    },
+    //apis:[`${__dirname}/docs/product.yaml`]
+    apis:[`${process.cwd()}/src/docs/*.yaml`]
+    //apis:[`src/docs/product.yaml`]
+}  
+
+const specs = swaggerJSDoc(swaggerOptions)
 
 //Middelware Sesiones
 app.use(
@@ -55,7 +77,6 @@ app.engine('handlebars', handlebars.engine({
     extname: 'handlebars',
     defaultLayout: 'main',
     helpers: {
-       
     }}));
 app.set('view engine', 'handlebars');
 app.set('views', __dirname + '/views');
@@ -74,7 +95,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/', appRouter)
-
+app.use('/apidocs', swaggerUIExpress.serve, swaggerUIExpress.setup(specs))
 
 app.listen(PORT, () => {
     console.log('Server UP');
