@@ -2,7 +2,18 @@
 import Product from "../../models/schema/products.schema.js"; // Importar el modelo de Product
 
 class ProductManagerService {
-    constructor() { }
+    constructor() {
+        this.saveBehavior = null;
+        this.findBehavior = null;
+    }
+
+    setSaveBehavior(callback) {
+        this.saveBehavior = callback;
+    }
+
+    setFindBehavior(callback) {
+        this.findBehavior = callback;
+    }
 
     //////////////////////
     // Agregar productos//
