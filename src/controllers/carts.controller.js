@@ -17,8 +17,6 @@ export const cartsController = async (req, res) => {
     }
 };
 
-
-
 export const addProductToCartController = async (req, res) => {
     try {
         const cartId = req.params.cid; // Obtener el ID del carrito desde los parámetros de la URL

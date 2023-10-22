@@ -25,12 +25,13 @@ class ProductManagerService {
             const codeExists = await Product.exists({ code });
             if (codeExists) {
                 console.log('Error al crear el producto: este código ya existe.');
-                return;
+                return { status: 400, message: 'El código ya existe' };
             }
 
             const product = new Product(newProduct);
             await product.save();
             console.log('Creación de producto satisfactoria!');
+            return { status: 200, message: 'Producto creado exitosamente' };
         } catch (error) {
             console.error('Error al agregar el producto:', error);
             throw error;

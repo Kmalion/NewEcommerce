@@ -106,8 +106,7 @@ class CartsServiceManager {
             cart.products.push({ ...product, date: formattedDate }); // Agrega la fecha al producto
     
             await cart.save();
-    
-            console.log('Producto agregado al carrito');
+            return { status: 200, message: 'Producto Agregado al Carrito' };
         } catch (error) {
             console.error('Error al agregar el producto al carrito:', error);
             throw error;
