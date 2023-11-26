@@ -1,39 +1,57 @@
-import  productsPaginateService  from '../services/products/products.paginator.service.js';
+import productsPaginateService from '../services/products/products.paginator.service.js';
 import ProductManagerService from '../services/products/products.manager.service.js';
-import UserValidator from '../services/policies/roleValidationService.js'
+import UserValidator from '../services/policies/roleValidationService.js';
+
 
 export const productsController = async (req, res, next) => {
   try {
+    // Verificar si el usuario está autenticado
+    if (!req.isAuthenticated()) {
+      req.flash('error', 'Debes iniciar sesión para acceder a esta página');
+      return res.redirect('/'); // Ajusta la ruta según tu configuración
+    }
+
+    // Resto del código
     const Products = new ProductManagerService();
     const products = await Products.getProducts();
-    const result = await productsPaginateService(req);
-    const productIds = products.map(product => product._id);
-    const owner = await products.map(product => product.owner);
+
+    const owner = products.map(product => product.owner);
+
+    // Obtener el array isOwner
     const userProfile = {
       first_name: req.user.first_name,
       last_name: req.user.last_name,
       email: req.user.email,
       age: req.user.age,
       role: req.user.role,
+      profilePic: req.user.documents.length > 0 ? req.user.documents[0].profilePic : null,
     };
     const Validator = new UserValidator();
-    const isPremium = await Validator.validateUserRole(userProfile,"premium")
-    const isAdmin = await Validator.validateUserRole(userProfile, "admin");
-    const isAdminOrOwner = await Validator.isUserAdminOrOwner(userProfile, owner);
-    const isOwner = await Validator.isOwner(userProfile, products);
     const isOwnerResults = await Validator.isOwner(userProfile, products);
-    const productsWithOwnership = products.map((product, index) => ({
-      ...product,
-      isOwner: isOwnerResults[index]
-    }));
+    const isOwner = isOwnerResults;
+
+    // Utiliza el servicio de paginación para paginar productsWithOwnership
+    const productsWithOwnership = products.map((product, index) => {
+      const isOwnerProduct = isOwner[index];
+      return {
+        ...product,
+        isOwner: isOwnerProduct,
+      };
+    });
+
+    const result = await productsPaginateService(req, productsWithOwnership);
+
     res.render('home', {
       products: result.products,
-      userProfile, productsWithOwnership,
+      userProfile,
       hasNextPage: result.hasNextPage,
       hasPrevPage: result.hasPrevPage,
       nextPage: result.nextPage,
       prevPage: result.prevPage,
-      isAdmin, isAdminOrOwner,isPremium,isOwner
+      isAdmin: await Validator.validateUserRole(userProfile, 'admin'),
+      isAdminOrOwner: await Validator.isUserAdminOrOwner(userProfile, owner),
+      isPremium: await Validator.validateUserRole(userProfile, 'premium'),
+      isOwner,
     });
   } catch (error) {
     console.error('Error al obtener los productos:', error);
@@ -41,10 +59,11 @@ export const productsController = async (req, res, next) => {
   }
 };
 
+
 export const productsCreate = async (req, res, next) => {
   try {
     const Products = new ProductManagerService();
-    const ownerId = req.user.email || 'admin'; 
+    const ownerId = req.user.email || 'admin';
 
     const newProduct = {
       title: req.body.title,
@@ -60,7 +79,7 @@ export const productsCreate = async (req, res, next) => {
 
     // Crea el nuevo producto en la base de datos
     await Products.addProduct(newProduct);
-
+    req.flash('success_msg', 'Producto creado satisfactoriamente');
     // Redirige a la página de productos después de la creación exitosa
     res.redirect('/products');
   } catch (error) {
@@ -78,17 +97,16 @@ export const productsCreateView = async (req, res, next) => {
     console.error('Error al crear el producto:', error);
     next(error); // Pasa el error al siguiente middleware de manejo de errores
   }
-}
+};
 
 export const deleteProductController = async (req, res, next) => {
   try {
     const productId = req.params.pid;
     const Products = new ProductManagerService();
     const products = await Products.deleteProduct(productId);
-    res.redirect('/products')
-
+    res.redirect('/products');
   } catch (error) {
     console.error('Error al eliminar producto:', error);
     next(error); // Pasa el error al siguiente middleware de manejo de errores
   }
-}
+};

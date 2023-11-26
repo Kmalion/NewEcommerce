@@ -30,7 +30,6 @@ class ProductManagerService {
 
             const product = new Product(newProduct);
             await product.save();
-            console.log('Creación de producto satisfactoria!');
             return { status: 200, message: 'Producto creado exitosamente' };
         } catch (error) {
             console.error('Error al agregar el producto:', error);

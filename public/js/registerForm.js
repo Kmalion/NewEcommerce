@@ -20,7 +20,6 @@ function handleRegisterForm() {
                 role: document.getElementById('role').value
             };
 
-            console.log(formData); // Imprime el objeto con los datos del formulario en la consola
 
             try {
                 const response = await fetch('/auth/register-auth', {
@@ -34,7 +33,7 @@ function handleRegisterForm() {
                 if (response.ok) {
                     // Si el registro es exitoso, redirige al usuario a la página de inicio de sesión
 
-                    window.location.href = '/view/login';
+                    window.location.href = '/';
                 } else {
                     // Si hay un error, muestra el mensaje de error en el formulario
                     const errorMessage = await response.text();

@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Usuario</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 
 <body>
@@ -12,39 +14,41 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
-                        <h3>Registro de Usuario</h3>
+                        <h3 class="text-center">Registro de Usuario</h3>
                     </div>
                     <div class="card-body">
-                        <form id="registerForm" action="/auth/register-auth" method="post">
-                            <div class="mb-3">
-                                <label for="first_name" class="form-label">Nombre</label>
+                        <form id="registerForm" action="/auth/register-auth" method="post" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="first_name">Nombre</label>
                                 <input type="text" class="form-control" id="first_name" name="first_name" required>
                             </div>
-                            <div class="mb-3">
-                                <label for="last_name" class="form-label">Apellido</label>
+                            <div class="form-group">
+                                <label for="last_name">Apellido</label>
                                 <input type="text" class="form-control" id="last_name" name="last_name" required>
                             </div>
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
+                            <div class="form-group">
+                                <label for="email">Email</label>
                                 <input type="email" class="form-control" id="email" name="email" required>
                             </div>
-                            <div class="mb-3">
-                                <label for="age" class="form-label">Edad</label>
+                            <div class="form-group">
+                                <label for="age">Edad</label>
                                 <input type="number" class="form-control" id="age" name="age" required>
                             </div>
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Contraseña</label>
+                            <div class="form-group">
+                                <label for="password">Contraseña</label>
                                 <input type="password" class="form-control" id="password" name="password" required>
                             </div>
-                            <div class="mb-3">
-                                <label for="role" class="form-label">Rol</label>
+                            <div class="form-group">
+                                <label for="role">Rol</label>
                                 <select class="form-control" id="role" name="role" required>
                                     <option value="admin">Admin</option>
                                     <option value="user">User</option>
-                                    <option value="premium">Premium</option> <!-- Cambiado el valor a "premium" -->
+                                    <option value="premium">Premium</option>
                                 </select>
                             </div>
-                            <button type="submit" class="btn btn-primary">Registrarse</button>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary">Registrarse</button>
+                            </div>
                         </form>
                     </div>
                 </div>

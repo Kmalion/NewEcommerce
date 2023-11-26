@@ -6,6 +6,7 @@ export const purchaseController = async (req, res, next) => {
   try {
     const cartId = req.params.cid;
     const userEmail = req.user.email;
+    const userId = req.user.id
     const cartService = new CartsServiceManager();
     const products = await cartService.getProductsByCartId(cartId);
 
@@ -22,8 +23,7 @@ export const purchaseController = async (req, res, next) => {
     }));
 
     // Realizar la compra
-    const ticket = await purchaseService.purchaseProducts(productList, userEmail);
-    console.log("Ticket a renderizar", ticket)
+    const ticket = await purchaseService.purchaseProducts(productList, userEmail)
     res.render('ticket', {
       code: ticket[0].code,
       purchaser: ticket[0].purchaser,
@@ -31,7 +31,9 @@ export const purchaseController = async (req, res, next) => {
       purchase_datetime: ticket[0].purchase_datetime
   });
 
-    
+  const result = await cartService.deleteCart(userId)
+  console.log(result)
+
   } catch (error) {
     console.error('Error al realizar la compra:', error);
     next(error);

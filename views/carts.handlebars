@@ -33,9 +33,9 @@
             <ul class="list-group list-group-flush">
               {{#each products}}
               <li class="list-group-item">
-                <h6>ID del Producto: {{product._id}}</h6>
-                <p>Título: {{product.title}}</p>
-                <p class="card-text"><img class="thumbnail-image" src="{{this.thumbnail}}" alt="Thumbnail"></p>
+                <h6>{{product.title}}</h6>
+                <p>ID del Producto: {{product._id}}</p>
+                <p class="card-text"><img class="thumbnail-image" src="{{product.thumbnail}}" alt="Thumbnail"></p>
                 <p>Descripción: {{product.description}}</p>
                 <p>Categoría: {{product.category}}</p>
                 <p class="price">Precio: ${{product.price}}</p>
@@ -67,7 +67,8 @@
             <p class="card-text" id="total-price"></p>
             <h6 class="card-subtitle mb-2 text-muted">Cantidad total de productos</h6>
             <p class="card-text" id="total-quantity"></p>
-            <a href="/api/{{_id}}/purchase/" class="btn btn-primary" >Proceder al pago de <span id="total-quantity-text"></span></a>
+            <a href="/api/{{_id}}/purchase/" class="btn btn-success" >Proceder al pago de <span id="total-quantity-text"></span></a>
+            <a href="/products" class="btn btn-primary mt-2">Volver a la tienda</a>
           </div>
         </div>
       </div>

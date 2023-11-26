@@ -7,9 +7,9 @@ const cartsDAO = new CartsMongoDAO()
 
 export const cartsController = async (req, res) => {
     try {
+        const userId = req.user.id;
         const Carts = new CartsServiceManager();
-        const carts = await Carts.getCarts()
-
+        const carts = await Carts.getCarts(userId)
         res.render('carts', { carts });
     } catch (error) {
         console.error('Error al obtener los carritos:', error);
@@ -19,24 +19,31 @@ export const cartsController = async (req, res) => {
 
 export const addProductToCartController = async (req, res) => {
     try {
-        const cartId = req.params.cid; // Obtener el ID del carrito desde los parámetros de la URL
-        const productId = req.params.pid; 
-        console.log('ID producto',productId)
-        const Carts = new CartsServiceManager();
-        const carts = await Carts.addProductToCart(cartId, productId)
-        res.redirect('/api/carts')
+        const userId = req.user.id;
+        const cartId = req.params.cid;
+        const productId = req.params.pid;
 
+        const Carts = new CartsServiceManager();
+        await Carts.addProductToCart(cartId, productId, userId);
+
+        res.redirect('/api/carts');
     } catch (error) {
         console.error('Error al agregar el producto al carrito:', error);
-        throw error;
+        res.status(500).json({ error: 'Error al agregar el producto al carrito' });
     }
 }
 
 
+
+
 export const createCart = async (req, res) => {
     try {
+        const userId = req.user.id;
+
         const Carts = new CartsServiceManager();
-        const carts = await Carts.createCart()
+        await Carts.createCart(userId);
+
+        res.redirect('/api/carts');
     } catch (error) {
         console.error('Error al crear el carrito:', error);
         res.status(500).json({ error: 'Error al crear el carrito' });
@@ -44,20 +51,23 @@ export const createCart = async (req, res) => {
 }
 export const getProductsByCartId = async (req, res) => {
     try {
-        
-        const Carts = new CartsServiceManager(carts._id);
-        const carts = await Carts.getProductsByCartId()
+        const cartId = req.params.cid;
+
+        const Carts = new CartsServiceManager();
+        const products = await Carts.getProductsByCartId(cartId);
+
+        res.json({ products });
     } catch (error) {
         console.error('Error al obtener los productos por ID de carrito:', error);
-            res.status(500).json({ error: 'Error al obtener los productos por ID de carrito' });
+        res.status(500).json({ error: 'Error al obtener los productos por ID de carrito' });
     }
 }
+
 
 export const deleteProductCartController = async (req, res) => {
     try {
         const cartId = req.params.cid; // Obtener el ID del carrito desde los parámetros de la URL
         const productId = req.params.pid; 
-        console.log('Id del carrito desde el controller ', cartId)
         const Carts = new CartsServiceManager();
         const carts = await Carts.deleteProductCart(cartId , productId)
         res.redirect('/api/carts')

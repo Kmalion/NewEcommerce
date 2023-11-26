@@ -1,9 +1,10 @@
+
 import ProductSchema from '../../models/schema/products.schema.js';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
 const Product = ProductSchema;
 
-const productsPaginateService = async (req) => {
+const productsPaginateService = async (req, productsWithOwnershi) => {
   try {
     const category = req.query.category;
     const page = parseInt(req.query.page);

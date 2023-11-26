@@ -16,8 +16,13 @@ router.post('/auth/login-auth', usersRouter)
 router.post('/auth/register-auth', usersRouter)
 router.get('/view/profile', profileRouter);
 router.get('/current',applyPolicy(['ADMIN']),usersRouter)
-router.get('/api/users/changeRole/:userId', usersRouter)
-
+router.post('/api/users/changeRole/:userId', usersRouter)
+router.get('/auth/github', usersRouter);
+router.get('/auth/github/callback', usersRouter);
+router.post('/api/users/:userId/upload', usersRouter);
+router.get('/uploadForm', profileRouter );
+router.post('/upload', profileRouter )
+router.get('/api/users/list', usersRouter)
 
 /// Productos ////
 router.get('/products', productsRouter);

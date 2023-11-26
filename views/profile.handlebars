@@ -16,6 +16,11 @@
             align-items: center;
             height: 100vh;
         }
+        /* Estilos para la imagen de perfil */
+        .profile-image {
+            max-width: 100%;
+            height: auto;
+        }
     </style>
 </head>
 
@@ -26,7 +31,8 @@
                 <div class="card-header">
                     <h4>Bienvenido, {{ first_name }}!</h4>
                 </div>
-                <div class="card-body">
+                <div class="card-body"> 
+                    <img src="{{profilePic}}" alt="Imagen de perfil" class="profile-image" style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%;">
                     <p>Nombre: {{ first_name }}</p>
                     <p>Apellido: {{ last_name }}</p>
                     <p>Email: {{ email }}</p>

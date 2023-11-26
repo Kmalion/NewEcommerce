@@ -10,29 +10,29 @@ class PurchaseManagerService {
     async purchaseProducts(products, userEmail) {
         try {
             let totalAmount = 0;
-    
+
             for (const product of products) {
                 const productId = product.productId;
                 const quantity = product.quantity;
                 const stock = await this.getStockForProduct(productId);
-    
+
                 if (quantity <= stock) {
                     await this.updateStock(productId, quantity);
-    
+
                     const productInfo = await ProductSchema.findById(productId);
                     totalAmount += productInfo.price * quantity;
                 } else {
-                    console.log("No hay stock del producto", productId)
+                    console.log("No hay stock del producto", productId);
                 }
             }
-    
+
             if (totalAmount === 0) {
                 throw new Error("El total de la compra es cero. No se puede proceder con la compra.");
             }
-    
+
             const code = Math.random().toString(36).substring(2, 8);
             const purchase_datetime = new Date().toISOString();
-    
+
             // Crear un objeto que represente el ticket
             const ticket = {
                 status: 'Compra exitosa',
@@ -41,7 +41,7 @@ class PurchaseManagerService {
                 code: code,
                 amount: totalAmount
             };
-    
+
             // Agregar la compra a la base de datos
             const purchase = await PurchaseSchema.create({
                 products: products,
@@ -50,7 +50,7 @@ class PurchaseManagerService {
                 code: code,
                 amount: totalAmount
             });
-    
+
             return [ticket]; // Devuelve un arreglo con el ticket
         } catch (error) {
             console.error('Error al realizar la compra de productos:', error);

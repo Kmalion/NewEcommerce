@@ -1,6 +1,21 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
-const usersCollection = "users"
+const usersCollection = "users";
+
+const documentSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: false,
+    },
+    link: {
+        type: String,
+        required: false,
+    }, 
+    profilePic: {
+        type: String,
+        required: false,
+    },
+});
 
 const userSchema = new mongoose.Schema({
     first_name: {
@@ -31,9 +46,8 @@ const userSchema = new mongoose.Schema({
         required: true,
     },
     githubId: {
-        type: String
+        type: String,
     },
-
     username: {
         type: String,
     },
@@ -42,7 +56,8 @@ const userSchema = new mongoose.Schema({
     },
     resetTokenExpires: {
         type: Date,
-    }
+    },
+    documents: [documentSchema],  // Agrega la propiedad de documentos al modelo de usuario
 });
 
 const UsersModel = mongoose.model(usersCollection, userSchema);

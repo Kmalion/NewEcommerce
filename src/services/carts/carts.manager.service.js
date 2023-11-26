@@ -9,33 +9,40 @@ class CartsServiceManager {
         this.path = path;
     }
     ///////CREA CARRITO/////////////
-    async addCart(newCart, products) {
-        try {
-            const currentDate = new Date().toISOString();
+    async addCart(newCart, products, userId) {
+    try {
+        const currentDate = new Date().toISOString();
 
-            newCart.date = currentDate;
-            newCart.products = products;
+        newCart.date = currentDate;
+        newCart.products = products;
+        newCart.userId = userId; // Asocia el carrito con el ID del usuario
 
-            const cart = new CartSchema(newCart);
-            await cart.save();
+        const cart = new CartSchema(newCart);
+        await cart.save();
 
-            console.table(cart);
-            console.log('Carrito agregado exitosamente!');
-        } catch (error) {
-            console.error('Error al agregar el carrito:', error);
-            throw error;
-        }
+        console.table(cart);
+        console.log('Carrito agregado exitosamente!');
+    } catch (error) {
+        console.error('Error al agregar el carrito:', error);
+        throw error;
     }
+}
 
-    async getCarts() {
-        try {
-            const carts = await CartSchema.find().populate('products.product').lean();
-            return carts;
-        } catch (error) {
-            console.error('Error al mostrar el carrito:', error);
-            throw error;
-        }
+async getCarts(userId) {
+    try {
+        const carts = await CartSchema.find({ userId }).populate('products.product').lean();
+        
+        // Filtra los carritos que tengan al menos un producto
+        const nonEmptyCarts = carts.filter(cart => cart.products.length > 0);
+        
+        return nonEmptyCarts;
+    } catch (error) {
+        console.error('Error al mostrar el carrito:', error);
+        throw error;
     }
+}
+
+
     /// Obtener Carrito por ID //////////
     async getCartById(cartId) {
         try {
@@ -58,19 +65,22 @@ class CartsServiceManager {
         try {
             // Obtener el carrito por ID
             const cart = await CartSchema.findById(cartId).populate('products.product');
+        
             if (!cart) {
-                return null; 
-                console.log("no se encuentra el carrito")// Si no se encuentra el carrito, puedes devolver null o un valor indicativo de que no se encontró.
+                console.log("No se encuentra el carrito");
+                return null; // Si no se encuentra el carrito, puedes devolver null o un valor indicativo de que no se encontró.
             }
             // Obtener los productos del carrito
             const products = cart.products;
-            console.log(products)
+            console.log(products);
             return products;
         } catch (error) {
             console.error('Error al obtener los productos por ID de carrito:', error);
             throw error;
         }
     }
+    
+
     async getStockForProduct(productId) {
         try {
             // Suponiendo que tienes un modelo de productos llamado ProductSchema
@@ -87,23 +97,40 @@ class CartsServiceManager {
         }
     }
 
-    async addProductToCart(cartId, productId) {
+    async addProductToCart(cartId, productId, userId) {
         try {
-            let cart = await CartSchema.findOne({ cid: cartId }).exec();
+            // Busca un carrito existente para el usuario actual
+            let cart = await CartSchema.findOne({ cid: cartId, userId }).exec();
+    
             if (!cart) {
-                cart = new CartSchema({ cid: cartId, products: [], date: new Date().toISOString() });
+                // Si el carrito no existe para el usuario actual, crea uno nuevo
+                cart = new CartSchema({
+                    cid: cartId,
+                    userId: userId,
+                    products: [],
+                    date: new Date().toISOString()
+                });
+            } else {
+                // Si el carrito existe pero no está asociado al nuevo userId, crea un nuevo carrito
+                if (cart.userId !== userId) {
+                    cart = new CartSchema({
+                        cid: cartId,
+                        userId: userId,
+                        products: [],
+                        date: new Date().toISOString()
+                    });
+                }
             }
-            
+    
             const now = new Date();
-            const formattedDate = now.toLocaleDateString(); // Formatea la fecha según tu preferencia
+            const formattedDate = now.toLocaleDateString();
     
             const product = {
                 product: productId,
                 quantity: 1,
             };
     
-            // Agrega el producto al arreglo "products" del carrito
-            cart.products.push({ ...product, date: formattedDate }); // Agrega la fecha al producto
+            cart.products.push({ ...product, date: formattedDate });
     
             await cart.save();
             return { status: 200, message: 'Producto Agregado al Carrito' };
@@ -113,12 +140,13 @@ class CartsServiceManager {
         }
     }
     
+    
+    
     async deleteProductCart(cartId, productId) {
         try {
             // Buscar el carrito por su ID
             const cart = await CartSchema.findById(cartId);
     
-            console.log('Carrito encontrado:', cart);
     
             if (!cart) {
                 return res.status(404).json({ error: 'Carrito no encontrado' });
@@ -129,9 +157,7 @@ class CartsServiceManager {
     
             // Eliminar el producto del carrito
             await cart.updateOne({ $pull: { products: { product: productId } } });
-    
-            
-    
+
             return { message: 'Producto eliminado del carrito exitosamente' };
         } catch (error) {
             console.error('Error al eliminar el producto del carrito:', error);
@@ -143,9 +169,7 @@ class CartsServiceManager {
         try {
             // Buscar el carrito por su ID
             const cart = await CartSchema.findById(cartId).populate('products.product');
-    
-            console.log('Carrito encontrado:', cart);
-    
+
             if (!cart) {
                 return { status: 404, message: 'Carrito no encontrado' };
             }
@@ -180,31 +204,47 @@ class CartsServiceManager {
     }
     
 
-    async createCart() {
+    async createCart(userId) {
         try {
             const currentDate = new Date();
             const formattedDate = `${currentDate.getDate()}/${currentDate.getMonth() + 1}/${currentDate.getFullYear()} ${currentDate.getHours()}:${currentDate.getMinutes()}`;
-
+    
             const newCart = new Cart({
                 cid: Math.random().toString(30).substring(2),
-                date: formattedDate, // Utiliza la fecha formateada
+                date: formattedDate,
+                userId, // Asocia el carrito con el ID del usuario
             });
-
+    
             const products = { ...req.body };
             newCart.products.push(products);
             await newCart.save();
-
+    
             res.send({
                 statusCode: 200,
                 payload: newCart
             });
-
+    
         } catch (error) {
             console.error('Error al crear el carrito:', error);
             res.status(500).json({ error: 'Error al crear el carrito' });
         }
     }
+    async deleteCart(userId) {
+        try {
 
+            const result = await CartSchema.deleteMany({ userId: userId });
+    
+            if (!result.deletedCount) {
+                return { status: 404, message: 'Carritos no encontrados para el usuario' };
+            }
+    
+            return { status: 200, message: 'Carritos eliminados exitosamente' };
+        } catch (error) {
+            console.error('Error al eliminar los carritos:', error);
+            return { status: 500, message: 'Error al eliminar los carritos' };
+        }
+    }
+    
 
 }
 
