@@ -15,7 +15,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "4.0.0",
+    "-": "^0.0.1",
+    "bcrypt": "5.0.0",
     "connect-flash": "^0.1.1",
     "connect-mongo": "^5.0.0",
     "cookie-parser": "^1.4.6",
@@ -40,6 +41,7 @@
     "sinon": "^17.0.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
+    "vercel": "^32.5.6",
     "winston": "^3.10.0"
   },
   "devDependencies": {
