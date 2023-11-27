@@ -1,10 +1,9 @@
-
 import ProductSchema from '../../models/schema/products.schema.js';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
 const Product = ProductSchema;
 
-const productsPaginateService = async (req, productsWithOwnershi) => {
+const productsPaginateService = async (req, { products, isOwner }) => {
   try {
     const category = req.query.category;
     const page = parseInt(req.query.page);
@@ -32,9 +31,17 @@ const productsPaginateService = async (req, productsWithOwnershi) => {
     const result = await Product.paginate({}, options);
 
     if (result.docs.length > 0) {
-      const products = result.docs.map((doc) => doc.toObject({ virtuals: true }));
+      const productsWithOwnership = result.docs.map((doc, index) => {
+        const pageIndex = (page - 1) * limit + index; // Calcula el índice en la página actual
+
+        return {
+          ...doc.toObject({ virtuals: true }),
+          isOwner: isOwner[pageIndex], // Asocia isOwner correctamente con cada producto
+        };
+      });
+
       return {
-        products,
+        products: productsWithOwnership,
         hasNextPage: result.hasNextPage,
         hasPrevPage: result.hasPrevPage,
         nextPage: result.nextPage,
@@ -57,5 +64,4 @@ const productsPaginateService = async (req, productsWithOwnershi) => {
   }
 };
 
-
-export default productsPaginateService
+export default productsPaginateService;

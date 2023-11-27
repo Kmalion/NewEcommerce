@@ -1,7 +1,7 @@
 import productsPaginateService from '../services/products/products.paginator.service.js';
 import ProductManagerService from '../services/products/products.manager.service.js';
 import UserValidator from '../services/policies/roleValidationService.js';
-
+import MailService from '../services/mailing/mailing.service.js'; 
 
 export const productsController = async (req, res, next) => {
   try {
@@ -38,8 +38,12 @@ export const productsController = async (req, res, next) => {
         isOwner: isOwnerProduct,
       };
     });
+    const result = await productsPaginateService(req, {
+      products: productsWithOwnership,
+      isOwner: isOwner, // Pasa isOwner como parte de un objeto
+    });
+    const isAdminOrOwner = await Validator.isUserAdminOrOwner(userProfile, owner)
 
-    const result = await productsPaginateService(req, productsWithOwnership);
 
     res.render('home', {
       products: result.products,
@@ -51,8 +55,9 @@ export const productsController = async (req, res, next) => {
       isAdmin: await Validator.validateUserRole(userProfile, 'admin'),
       isAdminOrOwner: await Validator.isUserAdminOrOwner(userProfile, owner),
       isPremium: await Validator.validateUserRole(userProfile, 'premium'),
-      isOwner,
+      isOwner, // Puede ser necesario ajustar cómo se pasa isOwner según la lógica de tu paginación
     });
+
   } catch (error) {
     console.error('Error al obtener los productos:', error);
     next(error); // Pasa el error al siguiente middleware de manejo de errores
@@ -104,6 +109,16 @@ export const deleteProductController = async (req, res, next) => {
     const productId = req.params.pid;
     const Products = new ProductManagerService();
     const products = await Products.deleteProduct(productId);
+    console.log("Productos", products)
+
+    // Obtén el propietario del producto eliminado
+    const ownerEmail = products.owner; // Ajusta según la estructura de tu modelo de producto
+    console.log("Owner email", ownerEmail)
+    // Envía un correo electrónico al propietario informándole sobre la eliminación del producto
+    const Mail = new MailService();
+    const mailResult = await Mail.sendProductDeletedEmail(ownerEmail, products.title, products.thumbnail); // Ajusta según tu lógica
+
+    // Redirige a la página de productos después de la eliminación exitosa
     res.redirect('/products');
   } catch (error) {
     console.error('Error al eliminar producto:', error);

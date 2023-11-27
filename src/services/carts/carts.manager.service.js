@@ -20,7 +20,7 @@ class CartsServiceManager {
         const cart = new CartSchema(newCart);
         await cart.save();
 
-        console.table(cart);
+
         console.log('Carrito agregado exitosamente!');
     } catch (error) {
         console.error('Error al agregar el carrito:', error);
@@ -59,26 +59,26 @@ async getCarts(userId) {
         }
     }
 
-    //////////////////////////////////////
-    //Mostrar producto por ID de carrito//
-    async getProductsByCartId(cartId) {
-        try {
-            // Obtener el carrito por ID
-            const cart = await CartSchema.findById(cartId).populate('products.product');
-        
-            if (!cart) {
-                console.log("No se encuentra el carrito");
-                return null; // Si no se encuentra el carrito, puedes devolver null o un valor indicativo de que no se encontró.
-            }
-            // Obtener los productos del carrito
-            const products = cart.products;
-            console.log(products);
-            return products;
-        } catch (error) {
-            console.error('Error al obtener los productos por ID de carrito:', error);
-            throw error;
+// Mostrar producto por ID de carrito
+async getProductsByCartId(cartId) {
+    try {
+        // Obtener el carrito por ID
+        const cart = await CartSchema.findById(cartId).populate('products.product');
+
+        if (!cart) {
+            console.log("No se encuentra el carrito");
+            return null;
         }
+
+        // Obtener los productos del carrito
+        const products = cart.products;
+        return products;
+    } catch (error) {
+        console.error('Error al obtener los productos por ID de carrito:', error);
+        throw error;
     }
+}
+
     
 
     async getStockForProduct(productId) {
@@ -99,27 +99,17 @@ async getCarts(userId) {
 
     async addProductToCart(cartId, productId, userId) {
         try {
-            // Busca un carrito existente para el usuario actual
+            // Busca un carrito existente para el usuario actual con el mismo cartId
             let cart = await CartSchema.findOne({ cid: cartId, userId }).exec();
     
             if (!cart) {
-                // Si el carrito no existe para el usuario actual, crea uno nuevo
+                // Si el carrito no existe para el usuario actual con el mismo cartId, crea uno nuevo
                 cart = new CartSchema({
                     cid: cartId,
                     userId: userId,
                     products: [],
-                    date: new Date().toISOString()
+                    date: new Date().toISOString(),
                 });
-            } else {
-                // Si el carrito existe pero no está asociado al nuevo userId, crea un nuevo carrito
-                if (cart.userId !== userId) {
-                    cart = new CartSchema({
-                        cid: cartId,
-                        userId: userId,
-                        products: [],
-                        date: new Date().toISOString()
-                    });
-                }
             }
     
             const now = new Date();
@@ -128,9 +118,10 @@ async getCarts(userId) {
             const product = {
                 product: productId,
                 quantity: 1,
+                date: formattedDate,
             };
     
-            cart.products.push({ ...product, date: formattedDate });
+            cart.products.push(product);
     
             await cart.save();
             return { status: 200, message: 'Producto Agregado al Carrito' };

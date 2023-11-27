@@ -90,19 +90,25 @@ class ProductManagerService {
 
     ///////////////////////
     // Eliminar Productos//
-    async deleteProduct(id) {
+    async deleteProduct(productId) {
         try {
-            const product = await Product.findByIdAndDelete(id).exec();
-            if (product) {
-                console.table('Producto eliminado satisfactoriamente !!');
-            } else {
-                console.error('Producto no encontrado para eliminar');
+            // Encuentra el producto por ID antes de eliminarlo
+            const deletedProduct = await Product.findById(productId);
+
+            if (!deletedProduct) {
+                throw new Error('El producto no fue encontrado.');
             }
+
+            // Elimina el producto después de obtener su información
+            await Product.findByIdAndDelete(productId);
+
+            return deletedProduct;
         } catch (error) {
-            console.error('Error al eliminar el producto:', error);
+            console.error('Error al eliminar producto:', error);
             throw error;
         }
     }
+
     async getProductOwner(productId) {
         console.log('Prodcuto ID en el servicio', productId)
         try {

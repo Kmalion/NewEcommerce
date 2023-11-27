@@ -55,27 +55,24 @@ export class UsersController {
             if (err) {
                 return next(err);
             }
-
-            console.log("req.body:", req.body);  // Agrega este console.log para ver los datos del cuerpo de la solicitud
-
+    
             if (!user) {
-                console.log("info.message:", info.message);  // Agrega este console.log para ver el mensaje de información
+                req.flash('error', info.message); // Almacena el mensaje de error en flash
                 return res.status(400).json({ message: info.message });
             }
-
+    
             req.logIn(user, async (loginErr) => {
                 if (loginErr) {
                     return next(loginErr);
                 }
-
-                console.log("User logged in:", user);  // Agrega este console.log para ver el usuario que ha iniciado sesión
-
+    
                 const token = UsersController.generateToken(user, res);
+                req.flash('success_msg', '¡Registro exitoso!'); // Almacena el mensaje de éxito en flash
                 res.redirect('/');
             });
         })(req, res, next);
     }
-
+    
 
     static async getCurrentUser(req, res, next) {
         res.send(req.user);
@@ -84,25 +81,30 @@ export class UsersController {
     static async changeUserRole(req, res, next) {
         const userId = req.params.userId;
         console.log('ID Usuario a cambiar rol:', userId);
-        
+
         try {
             // Verifica si el usuario actual es un administrador
             if (req.user.role !== 'admin') {
                 return res.status(403).json({ success: false, message: 'Acceso no autorizado' });
             }
-    
+
             const user = await User.findById(userId);
-    
+
             if (!user) {
                 return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
             }
-    
+
+            // Guarda el rol actual del usuario antes de cambiarlo
+            const oldRole = user.role;
+
             // Cambiar el rol del usuario
             const newRole = req.body.newRole;
-            console.log("Nuevo rol:", newRole);
             user.role = newRole || (user.role === 'user' ? 'premium' : 'user');
             await user.save();
-    
+
+            // Agrega un mensaje flash para informar al usuario sobre el cambio de rol
+            req.flash('success_msg', `Rol de usuario actualizado exitosamente. Rol anterior: ${oldRole}, Nuevo rol: ${user.role}`);
+
             return res.status(200).json({
                 success: true,
                 message: 'Rol de usuario actualizado exitosamente',
@@ -119,11 +121,17 @@ export class UsersController {
     }
 
 
+
     static async getUsersList(req, res, next) {
         try {
+            // Verificar si el usuario está autenticado
+            if (!req.isAuthenticated()) {
+                req.flash('error', 'Debes iniciar sesión para acceder a esta página');
+                return res.redirect('/'); // Ajusta la ruta según tu configuración
+            }
             const userService = new UserService();
             const users = await userService.getAllUsers();
-    
+
             const usersWithSelectedRole = users.map(user => {
                 return {
                     ...user,
@@ -132,7 +140,7 @@ export class UsersController {
                     isPremiumSelected: user.role === 'premium' ? 'selected' : '',
                 };
             });
-    
+
             // Renderiza la vista de usuarios y pasa la lista de usuarios con roles seleccionados
             res.render('usersList', { users: usersWithSelectedRole });
         } catch (error) {
@@ -140,7 +148,7 @@ export class UsersController {
             next(error);
         }
     };
-    
+
 
     static async uploadDocument(req, res, next) {
         try {
