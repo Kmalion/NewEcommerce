@@ -1,4 +1,3 @@
-<!-- usersList.hbs -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -27,6 +26,7 @@
                     <th>Email</th>
                     <th>Edad</th>
                     <th>Rol</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -45,7 +45,8 @@
                         </select>
                     </td>
                     <td>
-
+                        <!-- Agregar el botón de eliminar con un evento onclick -->
+                        <button class="btn btn-danger btn-sm" onclick="handleDeleteUser('{{this._id}}')">Eliminar</button>
                     </td>
                 </tr>
                 {{/each}}
@@ -53,42 +54,68 @@
         </table>
     </div>
 
- <!-- Script para cambiar el rol -->
-<script>
-   async function changeRole(userId, newRole) {
-    try {
-        console.log("Usuario ID:", userId);
-        console.log("New Role:", newRole);
-        const response = await fetch(`/api/users/changeRole/${userId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ newRole }),
-        });
+    <!-- Script para cambiar el rol y eliminar el usuario -->
+    <script>
+        async function changeRole(userId, newRole) {
+            try {
+                const response = await fetch(`/api/users/changeRole/${userId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ newRole }),
+                });
 
-        // Revisar el estado de la respuesta antes de intentar parsear el JSON
-        if (!response.ok) {
-            const errorData = await response.text();
-            console.error(`Error al cambiar el rol del usuario con ID ${userId}: ${errorData}`);
-            return;
+                // Revisar el estado de la respuesta antes de intentar parsear el JSON
+                if (!response.ok) {
+                    const errorData = await response.text();
+                    console.error(`Error al cambiar el rol del usuario con ID ${userId}: ${errorData}`);
+                    return;
+                }
+
+                const data = await response.json();
+                console.log(`Rol del usuario con ID ${userId} cambiado a ${newRole}`);
+
+            } catch (error) {
+                console.error(`Error al realizar la solicitud: ${error.message}`);
+            }
         }
 
-        const data = await response.json();
-        console.log(`Rol del usuario con ID ${userId} cambiado a ${newRole}`);
+        async function deleteUserData(userId) {
+            try {
+                const response = await fetch(`/api/users/delete/${userId}`, {
+                    method: 'GET',
+                });
 
-    } catch (error) {
-        console.error(`Error al realizar la solicitud: ${error.message}`);
-    }
-}
+                // Revisar el estado de la respuesta antes de intentar parsear el JSON
+                if (!response.ok) {
+                    const errorData = await response.text();
+                    console.error(`Error al eliminar el usuario con ID ${userId}: ${errorData}`);
+                    return;
+                }
 
+                const data = await response.json();
+                console.log(`Usuario con ID ${userId} eliminado correctamente`);
 
-    function handleSelectChange(event, userId) {
-        event.preventDefault();
-        const newRole = event.target.value;
-        changeRole(userId, newRole);
-    }
-</script>
+                // Recargar la página o actualizar la lista de usuarios después de la eliminación
+                location.reload();
+            } catch (error) {
+                console.error(`Error al realizar la solicitud de eliminación: ${error.message}`);
+            }
+        }
+
+        function handleSelectChange(event, userId) {
+            event.preventDefault();
+            const newRole = event.target.value;
+            changeRole(userId, newRole);
+        }
+
+        function handleDeleteUser(userId) {
+            if (confirm('¿Estás seguro de que quieres eliminar a este usuario?')) {
+                deleteUserData(userId);
+            }
+        }
+    </script>
 
 </body>
 

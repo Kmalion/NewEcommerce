@@ -220,6 +220,39 @@ class MailService {
             return { status: 'error', error: error.message };
         }
     }
+    async sendAccountDeletedEmail(email) {
+        try {
+            let result = await this.transporter.sendMail({
+                from: process.env.MAILING_USER,
+                to: email,
+                subject: 'Cuenta Eliminada por Inactividad',
+                html: `<!DOCTYPE html>
+                        <html lang="es">
+                            <head>
+                                <meta charset="UTF-8">
+                                <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+                                <title>Cuenta Eliminada por Inactividad</title>
+                                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MFjF0csQgzIUhUVs6FfFYT6Oh3U3ErV73YEGFmILsU3BpkCUln1f5BcDY7HpM7IgH" crossorigin="anonymous">
+                            </head>
+                            <body>
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <h1>Cuenta Eliminada por Inactividad</h1>
+                                            <p>Tu cuenta ha sido eliminada debido a la inactividad. Si deseas volver a utilizar nuestros servicios, por favor regístrate nuevamente.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-qGiFz7uhkE5wE9IiSzPmLvCJQG0pBhOu4M2sZS+nc2IitGjvh5ZfRG5zNtBYYKoKS" crossorigin="anonymous"></script>
+                            </body>
+                        </html>`
+            });
+
+            return { status: 'success', result: 'Email enviado' };
+        } catch (error) {
+            return { status: 'error', error: error.message };
+        }
+    }
 
 }
 export default MailService;

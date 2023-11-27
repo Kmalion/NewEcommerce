@@ -7,6 +7,7 @@ import { UsersMongoDAO } from '../models/daos/mongo/users.mongo.dao.js';
 import { setUserLoggedIn } from '../models/daos/mongo/auth.js';
 import User from '../models/schema/users.schema.js';
 import UserService from '../services/users/user.service.js';
+import MailService from '../services/mailing/mailing.service.js'
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -30,19 +31,24 @@ export class UsersController {
     }
 
     static async authenticateUser(req, res, next) {
-        passport.authenticate('login', (err, user, info) => {
+        passport.authenticate('login', async (err, user, info) => {
             if (err) {
                 return next(err);
             }
-
+    
             if (!user) {
                 return res.status(401).json({ message: info.message });
             }
-
-            req.logIn(user, (loginErr) => {
+    
+            req.logIn(user, async (loginErr) => {
                 if (loginErr) {
                     return next(loginErr);
                 }
+    
+                // Actualiza la propiedad lastLogin al momento del login
+                user.lastLogin = new Date();
+                await user.save();
+    
                 setUserLoggedIn(user);
                 const token = UsersController.generateToken(user, res);
                 res.redirect('/view/profile');
@@ -189,4 +195,83 @@ export class UsersController {
                 .json({ message: 'Error al subir el archivo', error: error.message });
         }
     }
-}
+    
+    static async deleteUser(req, res, next) {
+        const userId = req.params.userId;
+
+        try {
+            // Verifica si el usuario actual es un administrador
+            if (req.user.role !== 'admin') {
+                return res.status(403).json({ success: false, message: 'Acceso no autorizado' });
+            }
+            
+            // Busca y elimina el usuario por ID
+            const user = await User.findByIdAndDelete(userId);
+            if (!user) {
+                return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+            }
+
+            // Agrega un mensaje flash para informar al usuario sobre la eliminación
+            req.flash('success_msg', `Usuario eliminado exitosamente. Nombre: ${user.first_name}, ID: ${user._id}`);
+
+            return res.status(200).json({
+                success: true,
+                message: 'Usuario eliminado exitosamente',
+                user,
+            });
+        } catch (error) {
+            console.error('Error al eliminar el usuario:', error);
+            return res.status(500).json({
+                success: false,
+                message: 'Error al eliminar el usuario',
+                error: error.message,
+            });
+        }
+    }
+
+    static async cleanupInactiveUsers(req, res, next) {
+        try {
+            const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);  
+        
+            // Encuentra y elimina usuarios inactivos
+            const result = await User.deleteMany({
+                lastLogout: { $lt: thirtyMinutesAgo },
+            });
+        
+            console.log(`Eliminados ${result.deletedCount} usuarios inactivos.`);
+        
+            // Verifica si hay usuarios eliminados antes de continuar
+            if (result.deletedCount > 0) {
+                // Ahora, puedes llamar al servicio de correo para enviar un mensaje a los usuarios eliminados
+                const mailService = new MailService();
+                // Itera sobre los usuarios eliminados y envía un correo a cada uno
+                for (const deletedUser of result.deletedUsers) {
+                    const emailResult = await MailService.sendAccountDeletedEmail(deletedUser.email);
+                    console.log(emailResult);
+                }
+            }
+        
+            // Verifica si la respuesta (res) está definida antes de intentar acceder a sus propiedades
+            if (res) {
+                // Puedes redirigir a una página o enviar una respuesta adecuada
+                res.status(200).json({
+                    success: true,
+                    message: `Eliminados ${result.deletedCount} usuarios inactivos.`,
+                });
+            }
+        } catch (error) {
+            console.error('Error during user cleanup:', error);
+        
+            // Manejo de errores
+            // Verifica si la respuesta (res) está definida antes de intentar acceder a sus propiedades
+            if (res) {
+                res.status(500).json({
+                    success: false,
+                    message: 'Error during user cleanup',
+                    error: error.message,
+                });
+            }
+        }
+    }
+}    
+

@@ -11,7 +11,9 @@ router.get('/', loginController);
 
 // Rutas relacionadas con usuarios
 router.post('/api/users/changeRole/:userId', UsersController.changeUserRole);
-router.post('/api/users/:userId/upload', UsersController.uploadDocument); // Nueva ruta para subir documentos
+router.post('/api/users/:userId/upload', UsersController.uploadDocument); 
+router.get('/api/users/delete/:userId', UsersController.deleteUser);
+router.get('/cleanupUsers', UsersController.cleanupInactiveUsers);
 
 // Rutas de autenticación con GitHub
 router.get('/auth/github', passport.authenticate('github'));

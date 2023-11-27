@@ -6,6 +6,7 @@ import cartsRouter from './carts/carts.router.js'
 import purchaseRouter from './purchase/purchase.router.js'
 import applyPolicy from "../services/policies/auth.middleware.js";
 import mailRouter from '../router/mailing/mailing.router.js'
+import UsersModel from '../models/schema/users.schema.js';
 
 const router = Router()
 
@@ -23,7 +24,7 @@ router.post('/api/users/:userId/upload', usersRouter);
 router.get('/uploadForm', profileRouter );
 router.post('/upload', profileRouter )
 router.get('/api/users/list', usersRouter)
-
+router.get('/api/users/delete/:userId', usersRouter);
 /// Productos ////
 router.get('/products', productsRouter);
 router.get('/products/create', applyPolicy(['ADMIN','PREMIUM']),productsRouter)
@@ -52,11 +53,30 @@ router.post('/reset-password/:resetToken', mailRouter)
 // PURCHASE ///
 router.get('/api/:cid/purchase', purchaseRouter);
 // LOGOUT //
-router.get('/logout', (req, res) => {
-    req.session.destroy((err) => {
-      if (err) res.send('Failed logout');
-      res.redirect('/');
-    });
-  });
+router.get('/logout', async (req, res) => {
+  try {
+      // Verifica si el usuario está autenticado
+      if (req.isAuthenticated()) {
+          // Obtiene la fecha y hora actuales en el formato estándar de JavaScript
+          const currentDateTime = new Date().toISOString();
+
+          // Actualiza la propiedad lastLogout con la fecha y hora actuales
+          req.user.lastLogout = currentDateTime;
+          await req.user.save();
+      }
+
+      req.session.destroy((err) => {
+          if (err) {
+              console.error('Failed logout:', err);
+              res.status(500).send('Failed logout');
+          } else {
+              res.redirect('/');
+          }
+      });
+  } catch (error) {
+      console.error('Error during logout:', error);
+      res.status(500).send('Error during logout');
+  }
+});
 
 export default router

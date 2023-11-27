@@ -13,6 +13,8 @@ import { addLogger } from './src/utils/logger.js';
 import cookieParser from 'cookie-parser';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUIExpress from 'swagger-ui-express';
+import cron from 'node-cron';
+import { UsersController } from './src/controllers/users.controller.js';
 
 const PORT = CONFIG.mongo.PORT;
 const app = express();
@@ -89,6 +91,11 @@ app.get('/loggerTest', (req, res) => {
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+cron.schedule('*/30 * * * *', () => {
+    UsersController.cleanupInactiveUsers();
+});
+
 
 app.use('/', appRouter);
 app.use('/apidocs', swaggerUIExpress.serve, swaggerUIExpress.setup(specs));

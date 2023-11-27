@@ -57,6 +57,12 @@ const userSchema = new mongoose.Schema({
     resetTokenExpires: {
         type: Date,
     },
+    lastLogin: {
+        type: Date,
+    },
+    lastLogout: {
+        type: Date,
+    },
     documents: [documentSchema],  // Agrega la propiedad de documentos al modelo de usuario
 });
 
