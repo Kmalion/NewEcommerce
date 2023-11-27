@@ -9,8 +9,7 @@
   "type": "module",
   "scripts": {
     "test": "mocha test/router/*",
-    "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "nodemon index.js"
   },
   "keywords": [],
   "author": "",
