@@ -3465,3 +3465,5 @@ info: GET en /api/carts - 21:23:10
 info: GET en /logout - 21:23:14
 info: GET en / - 21:23:14
 info: GET en / - 22:31:03
+info: GET en /api/users/list - 23:16:24
+info: GET en / - 23:16:25
