@@ -8,7 +8,6 @@
   },
   "type": "module",
   "scripts": {
-    "vercel-build": "node ./build.js",
     "test": "mocha test/router/*",
     "start": "node index.js"
   },
@@ -43,6 +42,7 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
     "uuid": "^7.0.3",
+    "vercel": "^32.5.6",
     "winston": "^3.10.0"
   },
   "devDependencies": {
