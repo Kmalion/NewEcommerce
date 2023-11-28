@@ -8,9 +8,9 @@
   },
   "type": "module",
   "scripts": {
-    "vercel-build": "yarn global add node-gyp",
+    "vercel-build": "node-gyp",
     "test": "mocha test/router/*",
-    "start": "nodemon index.js"
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
