@@ -1,6 +1,6 @@
 import MailService from '../services/mailing/mailing.service.js';
 import User from '../models/schema/users.schema.js'
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 const mailController = new MailService();
 

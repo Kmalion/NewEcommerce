@@ -2,7 +2,7 @@ import passport from 'passport';
 import GitHubStrategy from 'passport-github';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { UsersMongoDAO } from '../../models/daos/mongo/users.mongo.dao.js';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt, { ExtractJwt } from 'passport-jwt';
 import config from '../config.js';
 

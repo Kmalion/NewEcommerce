@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
 import User from '../../models/schema/users.schema.js'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 
 class MailService {
     constructor() {
